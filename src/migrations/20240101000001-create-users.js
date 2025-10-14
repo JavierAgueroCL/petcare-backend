@@ -91,8 +91,7 @@ module.exports = {
       collate: 'utf8mb4_unicode_ci',
     });
 
-    // Agregar índices (email y rut ya tienen índice único automático)
-    await queryInterface.addIndex('users', ['role']);
+    // Agregar índice para commune (otros campos ya tienen índices automáticos)
     await queryInterface.addIndex('users', ['commune']);
   },
 
