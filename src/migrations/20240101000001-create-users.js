@@ -90,12 +90,9 @@ module.exports = {
       charset: 'utf8mb4',
       collate: 'utf8mb4_unicode_ci',
     });
-
-    // Agregar índice para commune (otros campos ya tienen índices automáticos)
-    await queryInterface.addIndex('users', ['commune']);
   },
 
-  down: async (queryInterface, Sequelize) => {
+  down: async (queryInterface) => {
     await queryInterface.dropTable('users');
   },
 };
