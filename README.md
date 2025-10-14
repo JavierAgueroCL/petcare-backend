@@ -16,7 +16,7 @@ API RESTful desarrollada con Node.js y Express que gestiona:
 - **Runtime**: Node.js 18+
 - **Framework**: Express.js
 - **Base de datos**: MySQL + Sequelize ORM
-- **Autenticación**: Auth0 (OAuth 2.0 / JWT)
+- **Autenticación**: JWT con bcrypt (autenticación local)
 - **Almacenamiento**: AWS S3
 - **Seguridad**: Helmet, CORS, Rate Limiting
 - **Validación**: Joi / Express Validator
@@ -27,8 +27,7 @@ API RESTful desarrollada con Node.js y Express que gestiona:
 - Node.js >= 18.0.0
 - npm >= 9.0.0
 - MySQL >= 8.0
-- Cuenta Auth0 (configurada)
-- Cuenta AWS con S3 (configurada)
+- Cuenta AWS con S3 (opcional, para producción)
 
 ## Instalación
 
@@ -97,19 +96,46 @@ npm start
 
 ## Scripts disponibles
 
+### Ejecución del servidor
+
 ```bash
-npm run dev              # Desarrollo con nodemon
-npm start                # Producción
-npm test                 # Ejecutar tests
+npm run dev              # Desarrollo con nodemon (NODE_ENV=development)
+npm start                # Producción (NODE_ENV=production)
+npm run start:qa         # QA (NODE_ENV=qa)
+npm run start:staging    # Staging (NODE_ENV=staging)
+```
+
+### Base de datos
+
+```bash
+npm run db:migrate           # Ejecutar migraciones
+npm run db:migrate:undo      # Deshacer última migración
+npm run db:migrate:undo:all  # Deshacer todas las migraciones
+npm run db:seed              # Ejecutar seeders (datos de prueba)
+npm run db:seed:undo         # Deshacer seeders
+npm run db:reset             # Reset completo (undo + migrate + seed)
+```
+
+### Testing
+
+```bash
+npm test                 # Ejecutar todos los tests con coverage
 npm run test:watch       # Tests en modo watch
 npm run test:integration # Solo tests de integración
 npm run test:unit        # Solo tests unitarios
+```
+
+### Calidad de código
+
+```bash
 npm run lint             # Linting con ESLint
 npm run lint:fix         # Linting + auto-fix
 npm run format           # Formatear código con Prettier
-npm run db:migrate       # Ejecutar migraciones
-npm run db:seed          # Ejecutar seeders
-npm run db:reset         # Reset completo de BD
+```
+
+### Documentación
+
+```bash
 npm run docs             # Generar documentación Swagger
 ```
 
@@ -118,6 +144,11 @@ npm run docs             # Generar documentación Swagger
 ### Esenciales
 
 ```env
+# Entorno
+NODE_ENV=development  # development, qa, staging, production
+PORT=3000
+HOST=0.0.0.0          # 0.0.0.0 para acceso desde red, localhost para solo local
+
 # Base de datos
 DB_HOST=localhost
 DB_PORT=3306
@@ -125,13 +156,10 @@ DB_NAME=petcare_db
 DB_USER=root
 DB_PASSWORD=tu_password
 
-# Auth0
-AUTH0_DOMAIN=tu-tenant.auth0.com
-AUTH0_AUDIENCE=https://api.petcare.cl
-AUTH0_CLIENT_ID=tu_client_id
-AUTH0_CLIENT_SECRET=tu_client_secret
+# Autenticación JWT
+JWT_SECRET=tu_secret_muy_seguro_minimo_64_caracteres
 
-# AWS S3
+# AWS S3 (opcional para desarrollo)
 AWS_REGION=us-east-1
 AWS_ACCESS_KEY_ID=tu_access_key
 AWS_SECRET_ACCESS_KEY=tu_secret_key
@@ -248,18 +276,53 @@ Ver documentación completa en `/api/docs` (Swagger UI).
 
 ## Autenticación
 
-Todas las rutas protegidas requieren un token JWT en el header:
+La autenticación usa JWT con bcrypt para passwords. Todas las rutas protegidas requieren un token JWT en el header:
 
 ```
 Authorization: Bearer <token>
 ```
 
-Obtener token desde Auth0:
+### Usuarios de prueba (después de ejecutar seeders)
 
 ```javascript
-// React Native / React
-const { getAccessTokenSilently } = useAuth0();
-const token = await getAccessTokenSilently();
+// Owner
+{
+  email: 'owner@petcare.cl',
+  password: 'password123',
+  role: 'owner'
+}
+
+// Veterinario
+{
+  email: 'veterinario@petcare.cl',
+  password: 'password123',
+  role: 'veterinarian'
+}
+
+// Admin
+{
+  email: 'admin@petcare.cl',
+  password: 'password123',
+  role: 'admin'
+}
+```
+
+### Obtener token
+
+```bash
+POST /api/auth/login
+Content-Type: application/json
+
+{
+  "email": "owner@petcare.cl",
+  "password": "password123"
+}
+
+# Respuesta
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "user": { ... }
+}
 ```
 
 ## Roles y Permisos

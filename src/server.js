@@ -8,6 +8,7 @@ const app = require('./app');
 const { sequelize } = require('./models');
 
 const PORT = process.env.PORT || 3000;
+const HOST = process.env.HOST || '0.0.0.0';
 
 // Verificar conexión a base de datos
 const startServer = async () => {
@@ -23,15 +24,16 @@ const startServer = async () => {
     }
 
     // Iniciar servidor
-    app.listen(PORT, () => {
+    app.listen(PORT, HOST, () => {
       console.log(`
 ╔═══════════════════════════════════════════════╗
 ║     🐾 PETCARE API SERVER                    ║
 ║     Servidor iniciado exitosamente           ║
 ║                                              ║
 ║     Environment: ${process.env.NODE_ENV?.padEnd(27) || 'development'.padEnd(27)}║
+║     Host: ${HOST.padEnd(38)}║
 ║     Port: ${PORT.toString().padEnd(35)}║
-║     URL: http://localhost:${PORT.toString().padEnd(20)}║
+║     URL: http://${HOST}:${PORT.toString().padEnd(20)}║
 ╚═══════════════════════════════════════════════╝
       `);
     });
