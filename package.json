@@ -15,9 +15,10 @@
     "format": "prettier --write \"src/**/*.js\"",
     "db:migrate": "sequelize-cli db:migrate",
     "db:migrate:undo": "sequelize-cli db:migrate:undo",
+    "db:migrate:undo:all": "node scripts/db-reset.js --undo-only",
     "db:seed": "sequelize-cli db:seed:all",
     "db:seed:undo": "sequelize-cli db:seed:undo:all",
-    "db:reset": "sequelize-cli db:migrate:undo:all && sequelize-cli db:migrate && sequelize-cli db:seed:all",
+    "db:reset": "node scripts/db-reset.js",
     "docs": "node docs/generate-swagger.js"
   },
   "keywords": [
