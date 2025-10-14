@@ -43,10 +43,10 @@ module.exports = {
       collate: 'utf8mb4_unicode_ci',
     });
 
-    await queryInterface.addIndex('pet_images', ['pet_id']);
+    // pet_id ya tiene índice automático por ser FK
   },
 
-  down: async (queryInterface, Sequelize) => {
+  down: async (queryInterface) => {
     await queryInterface.dropTable('pet_images');
   },
 };

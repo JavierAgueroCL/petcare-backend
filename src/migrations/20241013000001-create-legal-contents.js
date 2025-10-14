@@ -47,27 +47,11 @@ module.exports = {
       collate: 'utf8mb4_unicode_ci',
     });
 
-    // Crear índices solo si no existen
-    try {
-      await queryInterface.addIndex('legal_contents', ['type'], {
-        name: 'legal_contents_type_idx'
-      });
-    } catch (e) {}
-
-    try {
-      await queryInterface.addIndex('legal_contents', ['is_active'], {
-        name: 'legal_contents_is_active_idx'
-      });
-    } catch (e) {}
-
-    try {
-      await queryInterface.addIndex('legal_contents', ['type', 'is_active'], {
-        name: 'legal_contents_type_is_active_idx'
-      });
-    } catch (e) {}
+    // Agregar índices
+    await queryInterface.addIndex('legal_contents', ['type', 'is_active']);
   },
 
-  down: async (queryInterface, Sequelize) => {
+  down: async (queryInterface) => {
     await queryInterface.dropTable('legal_contents');
   },
 };

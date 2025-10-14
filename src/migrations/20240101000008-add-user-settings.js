@@ -20,7 +20,7 @@ module.exports = {
     });
   },
 
-  down: async (queryInterface, Sequelize) => {
+  down: async (queryInterface) => {
     await queryInterface.removeColumn('users', 'language');
     await queryInterface.removeColumn('users', 'notification_settings');
     await queryInterface.removeColumn('users', 'preferences');

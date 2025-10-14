@@ -124,15 +124,12 @@ module.exports = {
       collate: 'utf8mb4_unicode_ci',
     });
 
-    // Agregar índices
-    await queryInterface.addIndex('pets', ['owner_id']);
-    await queryInterface.addIndex('pets', ['microchip_number']);
-    await queryInterface.addIndex('pets', ['qr_code']);
+    // Agregar índices (owner_id, microchip_number y qr_code ya tienen índices automáticos)
     await queryInterface.addIndex('pets', ['status']);
     await queryInterface.addIndex('pets', ['species']);
   },
 
-  down: async (queryInterface, Sequelize) => {
+  down: async (queryInterface) => {
     await queryInterface.dropTable('pets');
   },
 };

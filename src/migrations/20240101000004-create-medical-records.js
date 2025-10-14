@@ -95,12 +95,12 @@ module.exports = {
       collate: 'utf8mb4_unicode_ci',
     });
 
-    await queryInterface.addIndex('medical_records', ['pet_id']);
+    // Agregar índices (pet_id ya tiene índice automático por ser FK)
     await queryInterface.addIndex('medical_records', ['date']);
     await queryInterface.addIndex('medical_records', ['record_type']);
   },
 
-  down: async (queryInterface, Sequelize) => {
+  down: async (queryInterface) => {
     await queryInterface.dropTable('medical_records');
   },
 };

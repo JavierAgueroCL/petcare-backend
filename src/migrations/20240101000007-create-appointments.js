@@ -80,13 +80,12 @@ module.exports = {
       collate: 'utf8mb4_unicode_ci',
     });
 
-    await queryInterface.addIndex('appointments', ['user_id']);
-    await queryInterface.addIndex('appointments', ['pet_id']);
+    // Agregar índices (user_id y pet_id ya tienen índices automáticos por ser FK)
     await queryInterface.addIndex('appointments', ['appointment_datetime']);
     await queryInterface.addIndex('appointments', ['status']);
   },
 
-  down: async (queryInterface, Sequelize) => {
+  down: async (queryInterface) => {
     await queryInterface.dropTable('appointments');
   },
 };

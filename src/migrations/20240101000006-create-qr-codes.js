@@ -50,10 +50,10 @@ module.exports = {
       collate: 'utf8mb4_unicode_ci',
     });
 
-    await queryInterface.addIndex('qr_codes', ['qr_code']);
+    // qr_code y pet_id ya tienen índices automáticos (unique y FK)
   },
 
-  down: async (queryInterface, Sequelize) => {
+  down: async (queryInterface) => {
     await queryInterface.dropTable('qr_codes');
   },
 };
