@@ -94,6 +94,37 @@ El servidor se iniciará en `http://localhost:3000`
 npm start
 ```
 
+### Producción con PM2 (Recomendado)
+
+PM2 es un gestor de procesos para Node.js que permite mantener el servidor corriendo en background y reiniciarlo automáticamente:
+
+```bash
+# Instalar pm2 globalmente
+npm install -g pm2
+
+# Iniciar servidor
+NODE_ENV=qa pm2 start src/server.js --name petcare-backend
+
+# Guardar configuración
+pm2 save
+
+# Configurar inicio automático al arrancar el sistema
+pm2 startup
+# Ejecuta el comando que pm2 te muestre
+
+# Ver logs
+pm2 logs petcare-backend
+
+# Reiniciar
+pm2 restart petcare-backend
+
+# Detener
+pm2 stop petcare-backend
+
+# Ver todos los procesos
+pm2 list
+```
+
 ## Scripts disponibles
 
 ### Ejecución del servidor

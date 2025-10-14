@@ -27,7 +27,24 @@ echo ""
 
 # 4. Matar procesos anteriores
 echo "4. Deteniendo procesos anteriores..."
-pkill -f "node src/server.js" || echo "No había procesos para detener"
+
+# Detener pm2 si está corriendo
+if command -v pm2 &> /dev/null; then
+    pm2 stop petcare-backend 2>/dev/null || true
+    pm2 delete petcare-backend 2>/dev/null || true
+fi
+
+# Matar procesos de node
+pkill -f "node src/server.js" || echo "No había procesos de node para detener"
+
+# Matar cualquier proceso usando el puerto 3000
+PORT_PID=$(lsof -ti:3000 2>/dev/null || true)
+if [ ! -z "$PORT_PID" ]; then
+    echo "Puerto 3000 está siendo usado por PID: $PORT_PID"
+    echo "Matando proceso..."
+    kill -9 $PORT_PID || true
+fi
+
 sleep 2
 echo ""
 
@@ -100,20 +117,37 @@ fi
 echo ""
 
 # 10. Iniciar servidor
-echo "10. Iniciando servidor en modo QA..."
-echo "Ejecutando: NODE_ENV=qa node src/server.js"
+echo "10. Iniciando servidor..."
 echo ""
 
-NODE_ENV=qa node src/server.js &
-SERVER_PID=$!
-
-echo "Servidor iniciado con PID: $SERVER_PID"
-sleep 3
+# Detectar si pm2 está disponible
+if command -v pm2 &> /dev/null; then
+    echo "pm2 detectado - usando pm2 para gestionar el proceso"
+    NODE_ENV=qa pm2 start src/server.js --name petcare-backend
+    pm2 save
+    echo ""
+    echo "Servidor iniciado con pm2"
+    echo "Para ver logs: pm2 logs petcare-backend"
+    echo "Para reiniciar: pm2 restart petcare-backend"
+    echo "Para detener: pm2 stop petcare-backend"
+    sleep 3
+    SERVER_PID=$(pm2 pid petcare-backend 2>/dev/null | head -n1)
+else
+    echo "pm2 no detectado - usando node directamente"
+    echo "RECOMENDACIÓN: Instala pm2 para mejor gestión del proceso:"
+    echo "  npm install -g pm2"
+    echo ""
+    echo "Ejecutando: NODE_ENV=qa node src/server.js"
+    NODE_ENV=qa node src/server.js &
+    SERVER_PID=$!
+    echo "Servidor iniciado con PID: $SERVER_PID"
+    sleep 3
+fi
 echo ""
 
 # 11. Verificar que el servidor esté corriendo
 echo "11. Verificando servidor..."
-if ps -p $SERVER_PID > /dev/null; then
+if [ ! -z "$SERVER_PID" ] && ps -p $SERVER_PID > /dev/null 2>&1; then
     echo "Servidor está corriendo (PID: $SERVER_PID)"
 else
     echo "ERROR: El servidor no está corriendo"
@@ -145,18 +179,32 @@ echo "========================================="
 echo "Diagnóstico completado"
 echo "========================================="
 echo ""
-echo "El servidor está corriendo en background."
-echo "PID del servidor: $SERVER_PID"
-echo ""
-echo "Para ver logs en tiempo real:"
-echo "  tail -f /var/log/petcare-backend.log"
-echo ""
-echo "Para detener el servidor:"
-echo "  kill $SERVER_PID"
-echo ""
-echo "Para mantenerlo corriendo permanentemente, usa pm2:"
-echo "  npm install -g pm2"
-echo "  pm2 start src/server.js --name petcare-backend"
-echo "  pm2 save"
-echo "  pm2 startup"
+
+if command -v pm2 &> /dev/null; then
+    echo "Servidor corriendo con pm2 (PID: $SERVER_PID)"
+    echo ""
+    echo "Comandos útiles de pm2:"
+    echo "  pm2 list                    - Ver todos los procesos"
+    echo "  pm2 logs petcare-backend    - Ver logs en tiempo real"
+    echo "  pm2 restart petcare-backend - Reiniciar servidor"
+    echo "  pm2 stop petcare-backend    - Detener servidor"
+    echo "  pm2 monit                   - Monitor en tiempo real"
+    echo ""
+    echo "Para que pm2 se inicie al arrancar el sistema:"
+    echo "  pm2 startup"
+    echo "  # Ejecuta el comando que pm2 te muestre"
+else
+    echo "Servidor corriendo con node (PID: $SERVER_PID)"
+    echo ""
+    echo "Para detener el servidor:"
+    echo "  kill $SERVER_PID"
+    echo ""
+    echo "ADVERTENCIA: El proceso se detendrá si cierras la terminal."
+    echo ""
+    echo "Para gestión de procesos en producción, instala pm2:"
+    echo "  npm install -g pm2"
+    echo "  pm2 start src/server.js --name petcare-backend"
+    echo "  pm2 save"
+    echo "  pm2 startup"
+fi
 echo ""
