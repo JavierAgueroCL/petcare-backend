@@ -156,6 +156,9 @@ DB_NAME=petcare_db
 DB_USER=root
 DB_PASSWORD=tu_password
 
+# CORS - Orígenes permitidos (separados por comas)
+ALLOWED_ORIGINS=http://localhost:3000,http://localhost:19006,http://localhost:8081
+
 # Autenticación JWT
 JWT_SECRET=tu_secret_muy_seguro_minimo_64_caracteres
 

@@ -52,6 +52,14 @@ else
     echo "Agregando HOST=0.0.0.0 al .env..."
     echo "HOST=0.0.0.0" >> .env
 fi
+
+# Verificar y configurar ALLOWED_ORIGINS
+if grep -q "^ALLOWED_ORIGINS=" .env; then
+    echo "ALLOWED_ORIGINS ya está configurado"
+else
+    echo "Agregando ALLOWED_ORIGINS al .env..."
+    echo "ALLOWED_ORIGINS=http://localhost:3000,http://localhost:19006,http://localhost:19000,http://localhost:8081,http://demo.devmania.cl:8081,http://demo.devmania.cl:19006" >> .env
+fi
 echo ""
 
 # 6. Verificar variables críticas
