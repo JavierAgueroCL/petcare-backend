@@ -5,12 +5,6 @@ module.exports = (sequelize, DataTypes) => {
       primaryKey: true,
       autoIncrement: true,
     },
-    auth0_id: {
-      type: DataTypes.STRING(255),
-      allowNull: true,
-      unique: true,
-      comment: 'ID del usuario en Auth0 (opcional si usa login local)',
-    },
     email: {
       type: DataTypes.STRING(255),
       allowNull: false,
@@ -21,8 +15,8 @@ module.exports = (sequelize, DataTypes) => {
     },
     password: {
       type: DataTypes.STRING(255),
-      allowNull: true,
-      comment: 'Password hasheado (solo para login local, no Auth0)',
+      allowNull: false,
+      comment: 'Password hasheado para autenticación',
     },
     phone: {
       type: DataTypes.STRING(20),
@@ -136,7 +130,6 @@ module.exports = (sequelize, DataTypes) => {
     timestamps: true,
     underscored: true,
     indexes: [
-      { fields: ['auth0_id'] },
       { fields: ['email'] },
       { fields: ['role'] },
       { fields: ['commune'] },
@@ -159,7 +152,6 @@ module.exports = (sequelize, DataTypes) => {
   User.prototype.toJSON = function() {
     const values = { ...this.get() };
     // No exponer datos sensibles
-    delete values.auth0_id;
     delete values.password;
     return values;
   };

@@ -23,7 +23,7 @@ const jwtCheck = async (req, res, next) => {
     // Agregar payload al request
     req.auth = {
       payload: {
-        sub: `local|${decoded.id}`, // Formato similar a Auth0 para compatibilidad
+        sub: decoded.id,
         id: decoded.id,
         email: decoded.email,
         role: decoded.role,
@@ -125,27 +125,6 @@ const checkRole = (allowedRoles) => {
 };
 
 /**
- * Middleware para verificar permisos específicos en Auth0
- * @param {String} permission - Permiso requerido (ej: 'write:pets')
- */
-const checkPermission = (permission) => {
-  return (req, res, next) => {
-    const namespace = process.env.AUTH0_AUDIENCE || 'https://api.petcare.cl';
-    const permissions = req.auth.payload.permissions || [];
-
-    // Si tiene el permiso específico o admin:all
-    if (permissions.includes(permission) || permissions.includes('admin:all')) {
-      return next();
-    }
-
-    return res.status(403).json({
-      error: 'Prohibido',
-      message: `Permiso requerido: ${permission}`,
-    });
-  };
-};
-
-/**
  * Middleware para verificar ownership
  * Verifica que el usuario sea el dueño del recurso
  * @param {String} resourceType - Tipo de recurso ('pet', 'user', etc)
@@ -238,7 +217,6 @@ module.exports = {
   jwtCheck,
   checkUserExists,
   checkRole,
-  checkPermission,
   checkOwnership,
   optionalAuth,
 };

@@ -6,16 +6,15 @@ module.exports = {
         primaryKey: true,
         autoIncrement: true,
       },
-      auth0_id: {
-        type: Sequelize.STRING(255),
-        allowNull: false,
-        unique: true,
-        comment: 'ID del usuario en Auth0',
-      },
       email: {
         type: Sequelize.STRING(255),
         allowNull: false,
         unique: true,
+      },
+      password: {
+        type: Sequelize.STRING(255),
+        allowNull: false,
+        comment: 'Password hasheado para autenticación',
       },
       phone: {
         type: Sequelize.STRING(20),
@@ -93,7 +92,6 @@ module.exports = {
     });
 
     // Agregar índices
-    await queryInterface.addIndex('users', ['auth0_id']);
     await queryInterface.addIndex('users', ['email']);
     await queryInterface.addIndex('users', ['role']);
     await queryInterface.addIndex('users', ['commune']);

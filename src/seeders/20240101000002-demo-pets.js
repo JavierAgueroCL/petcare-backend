@@ -4,7 +4,7 @@ module.exports = {
       {
         owner_id: 1, // Juan Pérez
         name: 'Max',
-        species: 'dog',
+        species: 'perro',
         breed: 'Labrador',
         gender: 'male',
         date_of_birth: '2020-05-15',
@@ -22,7 +22,7 @@ module.exports = {
       {
         owner_id: 1,
         name: 'Luna',
-        species: 'cat',
+        species: 'gato',
         breed: 'Siamés',
         gender: 'female',
         date_of_birth: '2021-08-20',
@@ -39,7 +39,7 @@ module.exports = {
       {
         owner_id: 1,
         name: 'Rockyy',
-        species: 'dog',
+        species: 'perro',
         breed: 'Pastor Alemán',
         gender: 'male',
         estimated_age_months: 48,

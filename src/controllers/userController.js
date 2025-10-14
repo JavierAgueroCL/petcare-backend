@@ -7,7 +7,7 @@ const response = require('../utils/response');
  */
 exports.getProfile = catchAsync(async (req, res) => {
   const user = await User.findByPk(req.user.id, {
-    attributes: { exclude: ['auth0_id'] },
+    attributes: { exclude: ['password'] },
   });
 
   if (!user) {
@@ -101,7 +101,7 @@ exports.deleteProfileImage = catchAsync(async (req, res) => {
  */
 exports.getUserById = catchAsync(async (req, res) => {
   const user = await User.findByPk(req.params.id, {
-    attributes: { exclude: ['auth0_id'] },
+    attributes: { exclude: ['password'] },
   });
 
   if (!user) {
@@ -138,7 +138,7 @@ exports.listUsers = catchAsync(async (req, res) => {
     limit: parseInt(limit),
     offset: parseInt(offset),
     order: [['created_at', 'DESC']],
-    attributes: { exclude: ['auth0_id'] },
+    attributes: { exclude: ['password'] },
   });
 
   response.successWithPagination(res, users, {
