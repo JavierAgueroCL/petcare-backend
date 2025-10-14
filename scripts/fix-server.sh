@@ -40,8 +40,14 @@ fi
 
 # Verificar si HOST está en .env
 if grep -q "^HOST=" .env; then
-    echo "HOST ya está configurado:"
-    grep "^HOST=" .env
+    CURRENT_HOST=$(grep "^HOST=" .env | cut -d'=' -f2)
+    if [ "$CURRENT_HOST" != "0.0.0.0" ]; then
+        echo "HOST está configurado incorrectamente: $CURRENT_HOST"
+        echo "Corrigiendo a HOST=0.0.0.0..."
+        sed -i 's/^HOST=.*/HOST=0.0.0.0/' .env
+    else
+        echo "HOST ya está configurado correctamente: 0.0.0.0"
+    fi
 else
     echo "Agregando HOST=0.0.0.0 al .env..."
     echo "HOST=0.0.0.0" >> .env
