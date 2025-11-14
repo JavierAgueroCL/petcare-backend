@@ -22,8 +22,16 @@ module.exports = (sequelize, DataTypes) => {
       },
     },
     appointment_type: {
-      type: DataTypes.ENUM('checkup', 'vaccine', 'grooming', 'emergency', 'surgery', 'other'),
+      type: DataTypes.ENUM('checkup', 'vaccine', 'emergency', 'surgery', 'consultation', 'other'),
       allowNull: false,
+    },
+    veterinary_id: {
+      type: DataTypes.INTEGER.UNSIGNED,
+      allowNull: true,
+      references: {
+        model: 'veterinaries',
+        key: 'id',
+      },
     },
     appointment_datetime: {
       type: DataTypes.DATE,
@@ -75,6 +83,11 @@ module.exports = (sequelize, DataTypes) => {
     Appointment.belongsTo(models.Pet, {
       foreignKey: 'pet_id',
       as: 'pet',
+    });
+
+    Appointment.belongsTo(models.Veterinary, {
+      foreignKey: 'veterinary_id',
+      as: 'veterinary',
     });
   };
 

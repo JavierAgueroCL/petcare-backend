@@ -32,8 +32,10 @@ db.User = require('./User')(sequelize, Sequelize.DataTypes);
 db.Pet = require('./Pet')(sequelize, Sequelize.DataTypes);
 db.PetImage = require('./PetImage')(sequelize, Sequelize.DataTypes);
 db.MedicalRecord = require('./MedicalRecord')(sequelize, Sequelize.DataTypes);
+db.MedicalRecordAttachment = require('./MedicalRecordAttachment')(sequelize, Sequelize.DataTypes);
 db.Vaccine = require('./Vaccine')(sequelize, Sequelize.DataTypes);
 db.QRCode = require('./QRCode')(sequelize, Sequelize.DataTypes);
+db.Veterinary = require('./Veterinary')(sequelize, Sequelize.DataTypes);
 db.Appointment = require('./Appointment')(sequelize, Sequelize.DataTypes);
 db.LegalContent = require('./LegalContent')(sequelize, Sequelize.DataTypes);
 

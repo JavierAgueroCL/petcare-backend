@@ -213,10 +213,32 @@ const optionalAuth = async (req, res, next) => {
   }
 };
 
+/**
+ * Middleware para verificar que el usuario es admin
+ */
+const isAdmin = (req, res, next) => {
+  if (!req.user) {
+    return res.status(401).json({
+      error: 'No autorizado',
+      message: 'Usuario no autenticado',
+    });
+  }
+
+  if (req.user.role !== 'admin') {
+    return res.status(403).json({
+      error: 'Prohibido',
+      message: 'Solo los administradores pueden acceder a este recurso',
+    });
+  }
+
+  next();
+};
+
 module.exports = {
   jwtCheck,
   checkUserExists,
   checkRole,
   checkOwnership,
   optionalAuth,
+  isAdmin,
 };

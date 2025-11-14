@@ -16,11 +16,11 @@ class QRService {
 
   /**
    * Generar imagen QR como buffer
-   * @param {String} code - Código a codificar
+   * @param {String} petId - ID de la mascota
    * @param {Object} options - Opciones de generación
    * @returns {Buffer} - Imagen QR en buffer
    */
-  async generateQRImage(code, options = {}) {
+  async generateQRImage(petId, options = {}) {
     try {
       const {
         width = 300,
@@ -31,8 +31,8 @@ class QRService {
         },
       } = options;
 
-      // Construir URL del QR
-      const qrUrl = `${process.env.QR_CODE_BASE_URL || 'https://petcare.cl/qr/'}${code}`;
+      // Construir URL del QR con el ID de la mascota
+      const qrUrl = `http://petcare.shop/qr/${petId}`;
 
       // Generar QR como buffer
       const qrBuffer = await QRCode.toBuffer(qrUrl, {
@@ -52,14 +52,14 @@ class QRService {
 
   /**
    * Generar QR y subirlo a S3
-   * @param {String} code - Código del QR
    * @param {String} petId - ID de la mascota
+   * @param {String} code - Código del QR
    * @returns {Object} - URL del QR en S3
    */
-  async generateAndUploadQR(code, petId) {
+  async generateAndUploadQR(petId, code) {
     try {
-      // Generar imagen QR
-      const qrBuffer = await this.generateQRImage(code);
+      // Generar imagen QR con el ID de la mascota
+      const qrBuffer = await this.generateQRImage(petId);
 
       // Subir a S3
       const result = await s3Service.uploadDocument(
@@ -104,7 +104,7 @@ class QRService {
       }
 
       // Generar y subir imagen QR
-      const { url, key } = await this.generateAndUploadQR(code, petId);
+      const { url, key } = await this.generateAndUploadQR(petId, code);
 
       // Crear registro en BD
       const qrCode = await QRCodeModel.create({
@@ -117,7 +117,7 @@ class QRService {
         id: qrCode.id,
         code: qrCode.qr_code,
         imageUrl: qrCode.qr_image_url,
-        publicUrl: `${process.env.QR_CODE_BASE_URL || 'https://petcare.cl/qr/'}${code}`,
+        publicUrl: `http://petcare.shop/qr/${petId}`,
       };
     } catch (error) {
       console.error('Error creating QR code for pet:', error);
@@ -206,13 +206,13 @@ class QRService {
 
   /**
    * Generar QR para descarga (sin guardar en BD)
-   * @param {String} code - Código a codificar
+   * @param {String} petId - ID de la mascota
    * @param {String} format - Formato de salida ('buffer', 'base64', 'dataURL')
    * @returns {Buffer|String} - QR en el formato solicitado
    */
-  async generateQRForDownload(code, format = 'buffer') {
+  async generateQRForDownload(petId, format = 'buffer') {
     try {
-      const qrUrl = `${process.env.QR_CODE_BASE_URL || 'https://petcare.cl/qr/'}${code}`;
+      const qrUrl = `http://petcare.shop/qr/${petId}`;
 
       switch (format) {
         case 'buffer':

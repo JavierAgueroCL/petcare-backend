@@ -2,10 +2,11 @@ const { Appointment, Pet, User } = require('../models');
 const { catchAsync, NotFoundError, ValidationError } = require('../utils/errors');
 const response = require('../utils/response');
 const { Op } = require('sequelize');
+const notificationController = require('./notificationController');
 
 // Crear una cita
 exports.createAppointment = catchAsync(async (req, res) => {
-  const { pet_id, appointment_type, appointment_datetime, notes, clinic_name, veterinarian_name } = req.body;
+  const { pet_id, appointment_type, appointment_datetime, notes, clinic_name, veterinarian_name, veterinary_id } = req.body;
 
   // Verificar que la mascota pertenezca al usuario
   const pet = await Pet.findOne({ where: { id: pet_id, owner_id: req.user.id } });
@@ -25,14 +26,26 @@ exports.createAppointment = catchAsync(async (req, res) => {
     notes,
     clinic_name,
     veterinarian_name,
+    veterinary_id,
     status: 'scheduled',
   });
 
   const createdAppointment = await Appointment.findByPk(appointment.id, {
     include: [
       { model: Pet, as: 'pet', attributes: ['id', 'name', 'species', 'breed'] },
+      { model: require('../models').Veterinary, as: 'veterinary', attributes: ['id', 'name', 'address', 'phone'] },
     ],
   });
+
+  // Crear recordatorio automático para la cita
+  await notificationController.createAppointmentReminder(
+    appointment.id,
+    pet_id,
+    req.user.id,
+    pet.name,
+    appointment_datetime,
+    appointment_type
+  );
 
   response.created(res, createdAppointment, 'Cita agendada exitosamente');
 });
@@ -59,6 +72,7 @@ exports.getUserAppointments = catchAsync(async (req, res) => {
     where,
     include: [
       { model: Pet, as: 'pet', attributes: ['id', 'name', 'species', 'breed', 'profile_image_url'] },
+      { model: require('../models').Veterinary, as: 'veterinary', attributes: ['id', 'name', 'address', 'phone'] },
     ],
     order: [['appointment_datetime', 'DESC']],
   });

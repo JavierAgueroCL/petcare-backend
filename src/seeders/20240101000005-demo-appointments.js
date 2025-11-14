@@ -43,11 +43,11 @@ module.exports = {
       {
         user_id: 1,
         pet_id: 1, // Max
-        appointment_type: 'grooming',
+        appointment_type: 'other',
         appointment_datetime: new Date(now.getTime() + 21 * 24 * 60 * 60 * 1000), // En 21 días
         status: 'scheduled',
         clinic_name: 'Peluquería Canina Happy Pet',
-        notes: 'Baño, corte de pelo y uñas. Incluye limpieza de oídos.',
+        notes: 'Baño, corte de pelo y uñas. Incluye limpieza de oídos. (Servicio de peluquería)',
         created_at: new Date(),
         updated_at: new Date(),
       },
@@ -108,11 +108,11 @@ module.exports = {
       {
         user_id: 1,
         pet_id: 1, // Max
-        appointment_type: 'grooming',
+        appointment_type: 'other',
         appointment_datetime: new Date(now.getTime() - 15 * 24 * 60 * 60 * 1000), // Hace 15 días
         status: 'completed',
         clinic_name: 'Peluquería Canina Happy Pet',
-        notes: 'Baño completo y corte de pelo.',
+        notes: 'Baño completo y corte de pelo. (Servicio de peluquería)',
         cost: 25000,
         created_at: new Date(now.getTime() - 15 * 24 * 60 * 60 * 1000),
         updated_at: new Date(now.getTime() - 15 * 24 * 60 * 60 * 1000),

@@ -104,6 +104,11 @@ module.exports = (sequelize, DataTypes) => {
       as: 'pet',
     });
 
+    MedicalRecord.hasMany(models.MedicalRecordAttachment, {
+      foreignKey: 'medical_record_id',
+      as: 'photos',
+    });
+
     // Si tienes modelo Veterinarian
     // MedicalRecord.belongsTo(models.Veterinarian, {
     //   foreignKey: 'veterinarian_id',

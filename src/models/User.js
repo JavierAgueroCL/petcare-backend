@@ -51,14 +51,42 @@ module.exports = (sequelize, DataTypes) => {
     address: {
       type: DataTypes.TEXT,
       allowNull: true,
+      comment: 'Dirección completa (deprecated, usar campos específicos)',
+    },
+    street: {
+      type: DataTypes.STRING(255),
+      allowNull: true,
+      comment: 'Calle',
+    },
+    street_number: {
+      type: DataTypes.STRING(20),
+      allowNull: true,
+      comment: 'Número de calle',
+    },
+    apartment: {
+      type: DataTypes.STRING(50),
+      allowNull: true,
+      comment: 'Departamento, piso, etc.',
     },
     commune: {
       type: DataTypes.STRING(100),
       allowNull: true,
+      comment: 'Comuna',
+    },
+    city: {
+      type: DataTypes.STRING(100),
+      allowNull: true,
+      comment: 'Ciudad',
     },
     region: {
       type: DataTypes.STRING(100),
       allowNull: true,
+      comment: 'Región',
+    },
+    postal_code: {
+      type: DataTypes.STRING(20),
+      allowNull: true,
+      comment: 'Código postal',
     },
     role: {
       type: DataTypes.ENUM('owner', 'veterinarian', 'ngo', 'municipality', 'admin'),

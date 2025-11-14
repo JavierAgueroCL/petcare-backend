@@ -82,6 +82,18 @@ const uploadDocument = multer({
 }).single('document');
 
 /**
+ * Middleware para upload de fotos/documentos médicos
+ * Límite: 20MB
+ */
+const uploadMedicalDocument = multer({
+  storage,
+  fileFilter: imageFilter,
+  limits: {
+    fileSize: 20 * 1024 * 1024, // 20MB
+  },
+});
+
+/**
  * Middleware de manejo de errores de multer
  */
 const handleMulterError = (err, req, res, next) => {
@@ -147,5 +159,6 @@ module.exports = {
   uploadSingleImage: wrapMulter(uploadSingleImage),
   uploadMultipleImages: wrapMulter(uploadMultipleImages),
   uploadDocument: wrapMulter(uploadDocument),
+  uploadMedicalDocument,
   handleMulterError,
 };

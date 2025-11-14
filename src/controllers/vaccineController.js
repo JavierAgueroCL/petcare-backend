@@ -1,6 +1,7 @@
 const { Vaccine, Pet } = require('../models');
 const { catchAsync, NotFoundError } = require('../utils/errors');
 const response = require('../utils/response');
+const notificationController = require('./notificationController');
 
 exports.createVaccine = catchAsync(async (req, res) => {
   const { petId } = req.params;
@@ -12,6 +13,17 @@ exports.createVaccine = catchAsync(async (req, res) => {
     ...req.validatedData,
     pet_id: petId,
   });
+
+  // Crear recordatorio automático si hay fecha de siguiente dosis
+  if (vaccine.next_dose_date) {
+    await notificationController.createVaccineReminder(
+      vaccine.id,
+      petId,
+      req.user.id,
+      vaccine.vaccine_name,
+      vaccine.next_dose_date
+    );
+  }
 
   response.created(res, vaccine, 'Vacuna registrada');
 });
@@ -46,6 +58,18 @@ exports.updateVaccine = catchAsync(async (req, res) => {
   }
 
   await vaccine.update(req.validatedData);
+
+  // Crear/actualizar recordatorio si hay fecha de siguiente dosis
+  if (vaccine.next_dose_date) {
+    await notificationController.createVaccineReminder(
+      vaccine.id,
+      vaccine.pet_id,
+      vaccine.pet.owner_id,
+      vaccine.vaccine_name,
+      vaccine.next_dose_date
+    );
+  }
+
   response.updated(res, vaccine);
 });
 

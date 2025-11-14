@@ -36,6 +36,59 @@ exports.scanQR = catchAsync(async (req, res) => {
 });
 
 /**
+ * Obtener información de mascota por ID (para la URL del QR)
+ * Endpoint público que será usado por el QR escaneado
+ */
+exports.getPetByIdPublic = catchAsync(async (req, res) => {
+  const { petId } = req.params;
+  const { Pet, User, QRCode } = require('../models');
+
+  const pet = await Pet.findByPk(petId, {
+    include: [
+      {
+        model: User,
+        as: 'owner',
+        attributes: ['id', 'first_name', 'last_name', 'phone'],
+      },
+    ],
+  });
+
+  if (!pet) {
+    return response.notFound(res, 'Mascota');
+  }
+
+  // Registrar escaneo si existe código QR
+  const qrCode = await QRCode.findOne({ where: { pet_id: petId } });
+  if (qrCode) {
+    await qrCode.recordScan();
+  }
+
+  // Preparar datos públicos de la mascota
+  const petData = {
+    name: pet.name,
+    species: pet.species,
+    breed: pet.breed,
+    gender: pet.gender,
+    color: pet.color,
+    profile_image_url: pet.profile_image_url,
+    owner: {
+      name: `${pet.owner.first_name} ${pet.owner.last_name}`,
+      phone: pet.owner.phone,
+    },
+  };
+
+  // Calcular edad si existe
+  if (pet.date_of_birth || pet.estimated_age_months) {
+    const age = pet.getAge();
+    if (age) {
+      petData.age = age.years > 0 ? `${age.years} años` : `${age.months} meses`;
+    }
+  }
+
+  response.success(res, petData);
+});
+
+/**
  * Regenerar código QR de una mascota
  */
 exports.regenerateQR = catchAsync(async (req, res) => {
@@ -85,5 +138,66 @@ exports.getQRScans = catchAsync(async (req, res) => {
     qr_code: qrCode.qr_code,
     total_scans: qrCode.total_scans,
     last_scanned_at: qrCode.last_scanned_at,
+  });
+});
+
+/**
+ * Generar QR para una mascota (si no existe) o obtener el existente
+ */
+exports.generatePetQR = catchAsync(async (req, res) => {
+  const { petId } = req.params;
+  const { Pet, QRCode } = require('../models');
+
+  const pet = await Pet.findOne({
+    where: { id: petId, owner_id: req.user.id },
+  });
+
+  if (!pet) {
+    return response.notFound(res, 'Mascota');
+  }
+
+  // Verificar si ya tiene un QR
+  let qrCode = await QRCode.findOne({
+    where: { pet_id: petId },
+  });
+
+  if (qrCode) {
+    // Ya tiene QR, devolver el existente
+    return response.success(res, {
+      id: qrCode.id,
+      code: qrCode.qr_code,
+      imageUrl: qrCode.qr_image_url,
+      publicUrl: `http://petcare.shop/qr/${petId}`,
+    });
+  }
+
+  // Generar nuevo QR
+  const newQRCode = await qrService.createQRCodeForPet(petId);
+
+  response.success(res, newQRCode, 'Código QR generado exitosamente');
+});
+
+/**
+ * Descargar QR como imagen
+ */
+exports.downloadPetQR = catchAsync(async (req, res) => {
+  const { petId } = req.params;
+  const { Pet } = require('../models');
+
+  const pet = await Pet.findOne({
+    where: { id: petId, owner_id: req.user.id },
+  });
+
+  if (!pet) {
+    return response.notFound(res, 'Mascota');
+  }
+
+  // Generar QR en formato base64
+  const qrBase64 = await qrService.generateQRForDownload(petId, 'base64');
+
+  response.success(res, {
+    qr_image: qrBase64,
+    pet_name: pet.name,
+    url: `http://petcare.shop/qr/${petId}`,
   });
 });
